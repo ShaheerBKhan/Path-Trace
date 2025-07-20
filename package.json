@@ -3,6 +3,16 @@
   "displayName": "Path Trace",
   "description": "Trace paths between functions using call hierarchy",
   "version": "0.0.1",
+  "publisher": "ShaheerBKhan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShaheerBKhan/Path-Trace.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShaheerBKhan/Path-Trace/issues"
+  },
+  "homepage": "https://github.com/ShaheerBKhan/Path-Trace#readme",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.102.0"
   },
