@@ -21,7 +21,7 @@ suite('Extension Test Suite', () => {
 		testEditor = await vscode.window.showTextDocument(testDocument);
 		
 		// Ensure extension is activated
-		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		const extension = vscode.extensions.getExtension('ShaheerBKhan.path-trace');
 		if (extension && !extension.isActive) {
 			await extension.activate();
 		}
@@ -32,12 +32,12 @@ suite('Extension Test Suite', () => {
 
 	test('Extension should be present', function() {
 		this.timeout(5000);
-		assert.ok(vscode.extensions.getExtension('undefined_publisher.path-trace'));
+		assert.ok(vscode.extensions.getExtension('ShaheerBKhan.path-trace'));
 	});
 
 	test('Extension should activate', async function() {
 		this.timeout(5000);
-		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		const extension = vscode.extensions.getExtension('ShaheerBKhan.path-trace');
 		if (extension) {
 			await extension.activate();
 			assert.strictEqual(extension.isActive, true);
@@ -121,7 +121,7 @@ suite('Extension Test Suite', () => {
 		// Test error handling when trying to find path without setting source/destination
 		
 		// Clear any previous state by reactivating extension
-		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		const extension = vscode.extensions.getExtension('ShaheerBKhan.path-trace');
 		if (extension && extension.isActive) {
 			await extension.activate();
 		}
@@ -164,7 +164,7 @@ suite('Extension Test Suite', () => {
 		// Verify that the submenu is properly configured
 		// This tests the package.json contribution points
 		
-		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		const extension = vscode.extensions.getExtension('ShaheerBKhan.path-trace');
 		assert.ok(extension, 'Extension should be available');
 		
 		if (extension) {
