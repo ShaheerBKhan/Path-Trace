@@ -73,6 +73,10 @@
         {
           "when": "editorTextFocus",
           "command": "path-trace.setDestination"
+        },
+        {
+          "when": "editorTextFocus",
+          "command": "path-trace.findPath"
         }
       ]
     }

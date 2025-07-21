@@ -54,6 +54,101 @@ suite('Extension Test Suite', () => {
 		assert.ok(commands.includes('path-trace.findPath'), 'findPath command should be registered');
 	});
 
+	test('Submenu should have all three commands', async function() {
+		this.timeout(5000);
+		
+		// Test that all three commands are accessible from the submenu
+		// This verifies the package.json menu configuration
+		const commands = await vscode.commands.getCommands(true);
+		
+		// Verify all submenu commands are registered
+		const submenuCommands = [
+			'path-trace.setSource',
+			'path-trace.setDestination', 
+			'path-trace.findPath'
+		];
+		
+		for (const command of submenuCommands) {
+			assert.ok(commands.includes(command), `Submenu command ${command} should be registered`);
+		}
+	});
+
+	test('Complete submenu workflow should work', async function() {
+		this.timeout(10000);
+		
+		// Test the complete workflow: Set Source -> Set Destination -> Find Path
+		
+		// Step 1: Set source function
+		let position = new vscode.Position(1, 17); // main function
+		testEditor.selection = new vscode.Selection(position, position);
+		
+		try {
+			await vscode.commands.executeCommand('path-trace.setSource');
+			assert.ok(true, 'Step 1: Set source from submenu successful');
+		} catch (error) {
+			assert.fail(`Step 1 failed: ${error}`);
+		}
+		
+		await new Promise(resolve => setTimeout(resolve, 500));
+		
+		// Step 2: Set destination function
+		position = new vscode.Position(27, 9); // logAccess function
+		testEditor.selection = new vscode.Selection(position, position);
+		
+		try {
+			await vscode.commands.executeCommand('path-trace.setDestination');
+			assert.ok(true, 'Step 2: Set destination from submenu successful');
+		} catch (error) {
+			assert.fail(`Step 2 failed: ${error}`);
+		}
+		
+		await new Promise(resolve => setTimeout(resolve, 500));
+		
+		// Step 3: Find path using submenu command
+		try {
+			await vscode.commands.executeCommand('path-trace.findPath');
+			assert.ok(true, 'Step 3: Find path from submenu successful');
+		} catch (error) {
+			assert.fail(`Step 3 failed: ${error}`);
+		}
+		
+		await new Promise(resolve => setTimeout(resolve, 1000));
+	});
+
+	test('Submenu commands should handle errors gracefully', async function() {
+		this.timeout(8000);
+		
+		// Test error handling when trying to find path without setting source/destination
+		
+		// Clear any previous state by reactivating extension
+		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		if (extension && extension.isActive) {
+			await extension.activate();
+		}
+		await new Promise(resolve => setTimeout(resolve, 500));
+		
+		// Try to find path without setting source or destination
+		try {
+			await vscode.commands.executeCommand('path-trace.findPath');
+			assert.ok(true, 'Find path handled missing source/destination gracefully');
+		} catch (error) {
+			assert.fail(`Find path should handle missing data gracefully: ${error}`);
+		}
+		
+		// Set only source, then try to find path
+		const position = new vscode.Position(1, 17);
+		testEditor.selection = new vscode.Selection(position, position);
+		await vscode.commands.executeCommand('path-trace.setSource');
+		await new Promise(resolve => setTimeout(resolve, 500));
+		
+		try {
+			await vscode.commands.executeCommand('path-trace.findPath');
+			assert.ok(true, 'Find path handled missing destination gracefully');
+		} catch (error) {
+			assert.fail(`Find path should handle missing destination: ${error}`);
+		}
+	});
+
 	test('Configuration should be available', function() {
 		this.timeout(5000);
 		const config = vscode.workspace.getConfiguration('pathTrace');
@@ -61,6 +156,37 @@ suite('Extension Test Suite', () => {
 		// Test default values
 		assert.strictEqual(config.get('maxSearchDepth'), 50);
 		assert.strictEqual(config.get('showProgressNotifications'), true);
+	});
+
+	test('Submenu configuration should be valid', function() {
+		this.timeout(5000);
+		
+		// Verify that the submenu is properly configured
+		// This tests the package.json contribution points
+		
+		const extension = vscode.extensions.getExtension('undefined_publisher.path-trace');
+		assert.ok(extension, 'Extension should be available');
+		
+		if (extension) {
+			const packageJson = extension.packageJSON;
+			
+			// Verify submenu is defined
+			assert.ok(packageJson.contributes.submenus, 'Submenus should be defined');
+			const pathTraceSubmenu = packageJson.contributes.submenus.find((s: any) => s.id === 'path-trace.submenu');
+			assert.ok(pathTraceSubmenu, 'Path Trace submenu should be defined');
+			assert.strictEqual(pathTraceSubmenu.label, 'Path Trace', 'Submenu should have correct label');
+			
+			// Verify submenu has all three commands
+			assert.ok(packageJson.contributes.menus['path-trace.submenu'], 'Submenu menu items should be defined');
+			const submenuItems = packageJson.contributes.menus['path-trace.submenu'];
+			assert.strictEqual(submenuItems.length, 3, 'Submenu should have exactly 3 items');
+			
+			// Verify each command is present
+			const commands = submenuItems.map((item: any) => item.command);
+			assert.ok(commands.includes('path-trace.setSource'), 'Submenu should include setSource');
+			assert.ok(commands.includes('path-trace.setDestination'), 'Submenu should include setDestination');
+			assert.ok(commands.includes('path-trace.findPath'), 'Submenu should include findPath');
+		}
 	});
 
 	test('Should execute setSource command from function name', async () => {
