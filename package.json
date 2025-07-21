@@ -2,7 +2,7 @@
   "name": "path-trace",
   "displayName": "Path Trace",
   "description": "Trace paths between functions using call hierarchy",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "ShaheerBKhan",
   "repository": {
     "type": "git",
